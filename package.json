@@ -1,0 +1,22 @@
+{
+  "name": "mini-program-builder",
+  "version": "1.0.0",
+  "author": "Liu Cheng <liucheng@flyingant.me>",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^2.17.1",
+    "copy-dir": "^0.4.0",
+    "mkdirp": "^0.5.1",
+    "node-watch": "^0.5.9",
+    "rimraf": "^2.6.2"
+  },
+  "scripts": {
+    "start": "run dev",
+    "dev": "node ./bin/index.js run dev -w -m dev",
+    "staging": "node ./bin/index.js run stg -m app",
+    "prod": "node ./bin/index.js run prod -m app",
+    "build-dev": "node ./bin/index.js build dev -m dev",
+    "build-staging": "node ./bin/index.js build staging -m app",
+    "build-prod": "node ./bin/index.js build prod -m app"
+  }
+}
