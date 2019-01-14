@@ -1,15 +1,1 @@
 /**index.wxss**/
-
-.section {
-  margin: 20px 0;
-}
-
-input {
-  border-bottom: 1px solid red;
-}
-
-button {
-  margin: 5px 0;
-  height: 40px;
-  line-height: 40px;
-}

@@ -1,5 +1,5 @@
 {
-	"description": "omni-event-mp",
+	"description": "mp-boilerplate",
 	"packOptions": {
 		"ignore": []
 	},
@@ -14,7 +14,7 @@
 	"compileType": "miniprogram",
 	"libVersion": "2.4.2",
 	"appid": "wx8106a5868f26d656",
-	"projectname": "omni-event",
+	"projectname": "mp-boilerplate",
 	"debugOptions": {
 		"hidedInDevtools": []
 	},

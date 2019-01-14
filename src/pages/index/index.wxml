@@ -3,18 +3,4 @@
   <view class="usermotto">
     <text class="user-motto">Hello World</text>
   </view>
-  
-  <view class="section">
-    <input bindinput="bindSceneCodeInput" placeholder="input Scene Code ..." auto-focus />
-  </view>
-  <view class="section">
-    <input bindinput="bindUTM_MediumInput" placeholder="input utm_medium ..." />
-  </view>
-  <view class="section">
-    <input bindinput="bindUTM_CampaignInput" placeholder="input utm_campaign ..." />
-  </view>
-
-  <view class="section">
-    <button bingtap="onTapToSendDataToGA">Send to GA</button>
-  </view>
 </view>

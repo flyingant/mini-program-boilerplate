@@ -46,7 +46,3 @@ export function relaunchToIndexPage(options) {
   return directlyRelaunch('/pages/index/index', options);
 }
 
-export function redirectToRequirePermissionPage(options) {
-  return directlyRedirectTo('/pages/auth/require-permission', options)
-}
-

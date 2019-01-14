@@ -1,7 +1,6 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/auth/require-permission"
+    "pages/index/index"
   ],
   "window": {
     "backgroundTextStyle": "light",

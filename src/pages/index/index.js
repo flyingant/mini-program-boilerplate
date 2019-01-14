@@ -7,9 +7,7 @@ const app = getApp();
 
 Page({
   data: {
-    sceneCode: '',
-    utm_medium: '',
-    utm_campaign: ''
+    
   },
   onLoad: function (queries) {
     initializeApp();
@@ -30,31 +28,5 @@ Page({
 
   onHide: function() {
     app.appStore.disconnect();
-  },
-
-  bindUTM_CampaignInput(e) {
-    this.setData({
-      utm_campaign: e.detail.value
-    })
-  },
-
-  bindUTM_MediumInput(e) {
-    this.setData({
-      utm_medium: e.detail.value
-    })
-  },
-
-  bindSceneCodeInput(e) {
-    this.setData({
-      sceneCode: e.detail.value
-    })
-  },
-
-  onTapToSendDataToGA: function() {
-    console.log('Scene Code:', this.data.sceneCode);
-    console.log('utm_medium:', this.data.utm_medium);
-    console.log('utm_campaign:', this.data.utm_campaign);
-    let encodedTrackingURL = encodeURI(`https://ga.wiredcraft.cn/?utm_source=${this.data.sceneCode}&utm_medium=${this.data.utm_medium}&utm_campaign=${this.data.utm_campaign}`);
-    app.tracker.trackSource(encodedTrackingURL);
   }
 })
