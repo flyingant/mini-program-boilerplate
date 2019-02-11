@@ -32,7 +32,7 @@ The final files for releasing are under folder `dist`
 
 ## Versioning
 
-Version: v1.0.0 (last updated at 2019-01-07)
+Version: v1.0.0 (last updated at 2019-02-11)
 
 ## Authors
 
