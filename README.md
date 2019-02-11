@@ -1,6 +1,16 @@
-# Mini Program Builder 
+# Mini Program boilerplate 
 
-`Mini Program Builder` is a tool (based on NodeJS) help to devlop/build the mini program under different environments (dev, staging, prod) and different mini program account.
+`Mini Program Boilerplate` is a tool (based on NodeJS) help to devlop/build the mini program under different environments (dev, staging, prod) and different mini program account.
+
+### Features
+
+```
+Node Builder support
+SCSS
+Prettier
+Eslint
+autoprefixer
+```
 
 ### Prerequisites
 
