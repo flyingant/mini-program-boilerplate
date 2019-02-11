@@ -3,14 +3,91 @@
 const fs = require('fs');
 const rimraf = require('rimraf');
 const mkdirp = require('mkdirp');
-const copydir = require('copy-dir');
+const copy = require('recursive-copy');
 const program = require('commander');
-const watch = require('node-watch')
+const watch = require('node-watch');
+const through = require('through2');
 
 const buildDir = `build`;
 const srcDir = `src`;
 const distDir = `dist`;
 const MPConfigDir = `mp-config`;
+
+const sass = require('node-sass');
+const util = require('util');
+const renderSass = util.promisify(sass.render);
+const postcss = require('postcss');
+const autoprefixer = require('autoprefixer');
+const cssnano = require('cssnano');
+const cssnanoPlugin = cssnano({
+  preset: [
+    'default',
+    {
+      calc: false,
+    },
+  ],
+});
+const postcssPlugins = [autoprefixer(['iOS >= 8', 'Android >= 4.1']), cssnanoPlugin];
+const postcssProcessor = postcss(postcssPlugins);
+
+const compileSass = async (inputPath) => {
+  try {
+    const a = await renderSass({ file: inputPath });
+    const { css } = await postcssProcessor.process(a.css, {
+      from: inputPath,
+    });
+    return css;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const chalk = require('chalk');
+const { CLIEngine } = require('eslint');
+const cli = new CLIEngine({ useEslintrc: true });
+
+const lintFiles = (files) => {
+  const filesToLint = files.filter((file) => {
+    const extension = file.slice(((file.lastIndexOf('.') - 1) >>> 0) + 2);
+    return extension === 'js' || extension === 'wxml';
+  });
+  const report = cli.executeOnFiles(filesToLint);
+  const errorReport = CLIEngine.getErrorResults(report.results);
+  errorReport.forEach((error) => {
+    const path = error.filePath.split('src/')[1];
+    error.messages.forEach((msg) => {
+      const message = `
+  ${chalk.bold(`eslint error: `)}${msg.message} [${msg.ruleId}] 
+    @ src/${path}, Ln ${msg.line} Col ${msg.column}`;
+      console.log(chalk.red(message));
+    });
+  });
+};
+
+// options for recursive-copy
+const options = {
+  overwrite: true,
+  junk: false,
+  transform: (src, dest, stats) => {
+    if (/\.scss$/.test(src)) {
+      return through(async (chunk, enc, done) => {
+        const css = await compileSass(src);
+        done(null, css);
+      });
+    }
+    /**
+  |--------------------------------------------------
+  | @todo: remove comments from JS files
+  |--------------------------------------------------
+  */
+  },
+  rename: (filePath) => {
+    if (/\.scss$/.test(filePath)) {
+      return filePath.replace(/\.scss$/, '.wxss');
+    }
+    return filePath;
+  },
+};
 
 program
     .command('run <env>')
@@ -21,10 +98,11 @@ program
     .action(function (env, cmd) {
       if (env === 'dev' || env === 'stg' || env === 'prod') {
           console.log('Removing the previously files ...');
-          rimraf(buildDir, () => mkdirp(buildDir, () => {
+          rimraf(buildDir, () => mkdirp(buildDir, async () => {
             console.log('Completed.');
             console.log('Copying the files ...');
-            copydir.sync(srcDir, buildDir);
+            const copyCode = copy(srcDir, buildDir, options);
+            await Promise.all([copyCode]);
             console.log('Completed.');
             console.log('Copying the constants file ...');
             fs
@@ -45,15 +123,23 @@ program
                 const destinationPath = `${buildDir}/${targetFileName}`;
                 console.log(evt, targetFileName);
                 if (evt === 'update') {
-                  fs.stat(src, (err, stats) => {
+                  fs.stat(src, async (err, stats) => {
                     if (stats.isFile()) {
-                      fs.createReadStream(src).pipe(fs.createWriteStream(destinationPath))
+                      lintFiles([`src/${targetFileName}`]);
+                      if (/\.scss$/.test(targetFileName)) {
+                        const css = await compileSass(src);
+                        destinationPath = destinationPath.replace(/\.scss$/, '.wxss');
+                        // fs.createWriteStream(destinationPath, css);
+                        fs.writeFile(destinationPath, css, 'utf8', () => null);
+                      } else {
+                        fs.createReadStream(src).pipe(fs.createWriteStream(destinationPath));
+                      }
                     } else {
-                      if (!fs.existsSync(destinationPath)){
-                        fs.mkdirSync(destinationPath)
+                      if (!fs.existsSync(destinationPath)) {
+                        fs.mkdirSync(destinationPath);
                       }
                     }
-                  })
+                  });
                 } else {
                   rimraf(destinationPath, () => null);
                 }        
@@ -88,10 +174,10 @@ program
     .action(function (env, cmd) {
       if (env === 'dev' || env === 'stg' || env === 'prod') {
           console.log('Removing the previously files ...');
-          rimraf(distDir, () => mkdirp(distDir, () => {
+          rimraf(distDir, () => mkdirp(distDir, async () => {
             console.log('Completed.');
             console.log('Copying the files ...');
-            copydir.sync(srcDir, distDir);
+            await copy(srcDir, distDir, options);
             console.log('Completed.');
             console.log('Copying the constants file ...');
             fs
