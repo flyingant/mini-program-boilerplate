@@ -120,7 +120,7 @@ program
               console.log('Start watching the file changes...');
               watch(srcDir, { recursive: true }, (evt, src) => {
                 const targetFileName = src.split('/').slice(1).join('/')
-                const destinationPath = `${buildDir}/${targetFileName}`;
+                let destinationPath = `${buildDir}/${targetFileName}`;
                 console.log(evt, targetFileName);
                 if (evt === 'update') {
                   fs.stat(src, async (err, stats) => {
