@@ -1,6 +1,5 @@
-<!--index.wxml-->
-<view class="container">
-  <view class="usermotto">
-    <text class="user-motto">Hello World</text>
+<view class="w-screen h-screen flex flex-col items-center justify-center">
+  <view class="w-full h-80 text-center">
+    <text>Hello World</text>
   </view>
 </view>

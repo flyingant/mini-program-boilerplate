@@ -1,5 +1,5 @@
 {
-  "name": "mini-program-builder",
+  "name": "mini-program-boilerplate",
   "version": "1.0.0",
   "author": "Liu Cheng <liucheng@flyingant.me>",
   "license": "MIT",
@@ -14,21 +14,22 @@
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-prettier": "^3.0.1",
     "mkdirp": "^0.5.1",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.12.0",
     "node-watch": "^0.5.9",
     "postcss": "^7.0.13",
     "prettier": "1.15.3",
     "recursive-copy": "^2.0.9",
     "rimraf": "^2.6.2",
+    "tailwindcss": "^1.4.6",
     "through2": "^3.0.0"
   },
   "scripts": {
     "start": "run dev",
-    "dev": "node ./bin/index.js run dev -w -m dev",
-    "staging": "node ./bin/index.js run stg -m app",
-    "prod": "node ./bin/index.js run prod -m app",
-    "build-dev": "node ./bin/index.js build dev -m dev",
-    "build-staging": "node ./bin/index.js build staging -m app",
-    "build-prod": "node ./bin/index.js build prod -m app"
+    "dev": "node ./bin/index.js run dev -w ",
+    "stg": "node ./bin/index.js run stg -w",
+    "prod": "node ./bin/index.js run prod -w",
+    "build-dev": "node ./bin/index.js build dev",
+    "build-stg": "node ./bin/index.js build staging",
+    "build-prod": "node ./bin/index.js build prod"
   }
 }

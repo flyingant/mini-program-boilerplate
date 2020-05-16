@@ -61,6 +61,6 @@ typings/
 .next
 
 # build output
-build/
+mp-target-folder/
 
 dist/

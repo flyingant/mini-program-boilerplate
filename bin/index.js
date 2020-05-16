@@ -8,10 +8,8 @@ const program = require('commander');
 const watch = require('node-watch');
 const through = require('through2');
 
-const buildDir = `build`;
 const srcDir = `src`;
-const distDir = `dist`;
-const MPConfigDir = `mp-config`;
+const distDir = `mp-target-folder`;
 
 const sass = require('node-sass');
 const util = require('util');
@@ -27,7 +25,11 @@ const cssnanoPlugin = cssnano({
     },
   ],
 });
-const postcssPlugins = [autoprefixer(['iOS >= 8', 'Android >= 4.1']), cssnanoPlugin];
+const postcssPlugins = [
+  require('tailwindcss')('tailwind.config.js'),
+  autoprefixer(['iOS >= 8', 'Android >= 4.1']),
+  cssnanoPlugin
+];
 const postcssProcessor = postcss(postcssPlugins);
 
 const compileSass = async (inputPath) => {
@@ -93,34 +95,33 @@ program
     .command('run <env>')
     .alias('r')
     .option('-w, --watch', 'watch files changes')
-    .option('-m, --mp <name>', 'target mini program name')
     .description('Build or Watch the version of selected environment')
     .action(function (env, cmd) {
       if (env === 'dev' || env === 'stg' || env === 'prod') {
-          console.log('Removing the previously files ...');
-          rimraf(buildDir, () => mkdirp(buildDir, async () => {
+          console.log('Clean previously files ...');
+          rimraf(distDir, () => mkdirp(distDir, async () => {
             console.log('Completed.');
             console.log('Copying the files ...');
-            const copyCode = copy(srcDir, buildDir, options);
+            const copyCode = copy(srcDir, distDir, options);
             await Promise.all([copyCode]);
             console.log('Completed.');
             console.log('Copying the constants file ...');
             fs
-              .createReadStream(`project.${env}.constants.js`)
-              .pipe(fs.createWriteStream(`${buildDir}/project.constants.js`));
+              .createReadStream(`constants.${env}.js`)
+              .pipe(fs.createWriteStream(`${distDir}/project.constants.js`));
             console.log('Completed.');
             if (cmd.mp) {
               console.log('Copying the mini program config file ...');
               fs
-              .createReadStream(`${MPConfigDir}/${cmd.mp}.project.config.json`)
-              .pipe(fs.createWriteStream(`${buildDir}/project.config.json`));
+              .createReadStream(`env.${env}.json`)
+              .pipe(fs.createWriteStream(`${distDir}/project.config.json`));
               console.log('Completed.');
             }
             if (cmd.watch) {
               console.log('Start watching the file changes...');
               watch(srcDir, { recursive: true }, (evt, src) => {
                 const targetFileName = src.split('/').slice(1).join('/')
-                let destinationPath = `${buildDir}/${targetFileName}`;
+                let destinationPath = `${distDir}/${targetFileName}`;
                 console.log(evt, targetFileName);
                 if (evt === 'update') {
                   fs.stat(src, async (err, stats) => {
@@ -144,20 +145,18 @@ program
                   rimraf(destinationPath, () => null);
                 }        
               });
-              watch(`project.${env}.constants.js`, { recursive: true }, (evt, src) => {
-                console.log(evt, `${buildDir}/project.constants.js`);
+              watch(`constants.${env}.js`, { recursive: true }, (evt, src) => {
+                console.log(evt, `${distDir}/project.constants.js`);
                 fs
                   .createReadStream(`project.${env}.constants.js`)
-                  .pipe(fs.createWriteStream(`${buildDir}/project.constants.js`));       
+                  .pipe(fs.createWriteStream(`${distDir}/project.constants.js`));       
               });
-              if (cmd.mp) {
-                watch(`${MPConfigDir}/${cmd.mp}.project.config.json`, { recursive: true }, (evt, src) => {
-                    console.log(evt, `${buildDir}/project.config.json`);
-                  fs
-                    .createReadStream(`${MPConfigDir}/${cmd.mp}.project.config.json`)
-                    .pipe(fs.createWriteStream(`${buildDir}/project.config.json`));      
-                  });
-                }
+              watch(`env.${env}.json`, { recursive: true }, (evt, src) => {
+                console.log(evt, `${distDir}/project.config.json`);
+              fs
+                .createReadStream(`env.${env}.json`)
+                .pipe(fs.createWriteStream(`${distDir}/project.config.json`));      
+              });
             }
           }));
       } else {
@@ -169,7 +168,6 @@ program
 program
     .command('build <env>')
     .alias('b')
-    .option('-m, --mp <name>', 'target mini program name')
     .description('Build the release version')
     .action(function (env, cmd) {
       if (env === 'dev' || env === 'stg' || env === 'prod') {
@@ -181,16 +179,14 @@ program
             console.log('Completed.');
             console.log('Copying the constants file ...');
             fs
-              .createReadStream(`project.${env}.constants.js`)
+              .createReadStream(`constants.${env}.js`)
               .pipe(fs.createWriteStream(`${distDir}/project.constants.js`));
             console.log('Completed.');
-            if (cmd.mp) {
-              console.log('Copying the mini program config file ...');
-              fs
-              .createReadStream(`${MPConfigDir}/${cmd.mp}.project.config.json`)
-              .pipe(fs.createWriteStream(`${distDir}/project.config.json`));
-              console.log('Completed.');
-            }
+            console.log('Copying the mini program config file ...');
+            fs
+            .createReadStream(`env.${env}.json`)
+            .pipe(fs.createWriteStream(`${distDir}/project.config.json`));
+            console.log('Completed.');
           }));
       } else {
         console.error(env +' is an unknown environment params!');

@@ -1,16 +1,20 @@
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable no-restricted-syntax */
 const serialize = (obj, prefix) => {
-  let str = [],
-    p;
+  const str = [];
+  let p;
   for (p in obj) {
     if (obj.hasOwnProperty(p)) {
-      let k = prefix ? prefix + "[" + p + "]" : p,
-        v = obj[p];
-      str.push((v !== null && typeof v === "object") ?
-        serialize(v, k) :
-        encodeURIComponent(k) + "=" + encodeURIComponent(v));
+      const k = prefix ? `${prefix}[${p}]` : p;
+      const v = obj[p];
+      str.push(
+        v !== null && typeof v === 'object'
+          ? serialize(v, k)
+          : `${encodeURIComponent(k)}=${encodeURIComponent(v)}`,
+      );
     }
   }
-  return str.join("&");
-}
+  return str.join('&');
+};
 
-export default serialize
+export default serialize;
