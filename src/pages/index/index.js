@@ -1,3 +1,5 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable no-const-assign */
 /* eslint-disable import/no-unresolved */
 import log from '../../utils/logger';
 
@@ -10,9 +12,21 @@ Page({
   onShow() {
     app.setActivePage(this, (state) => {
       log('Global State:', state);
-      return {};
+      const { message, count } = state;
+      return {
+        message,
+        count,
+      };
     });
   },
 
-  onHide() {},
+  onTapToChangeCount() {
+    let { count } = this.data;
+    ++count;
+    app.dispatch({
+      count,
+      message: `你点击了 ${count} 次`,
+    });
+    log('Page State:', this.data);
+  },
 });

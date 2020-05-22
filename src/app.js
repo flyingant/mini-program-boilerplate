@@ -22,6 +22,8 @@ const merge = (dest, src) => {
 
 const INITIAL_STATE = {
   deviceInfo: {},
+  message: 'Hello 啊！',
+  count: 0,
 };
 
 App({
