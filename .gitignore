@@ -64,3 +64,5 @@ typings/
 mp-target-folder/
 
 dist/
+
+.DS_Store

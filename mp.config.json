@@ -1,5 +1,5 @@
 {
-	"description": "mp-boilerplate-prod",
+	"description": "mp-boilerplate",
 	"packOptions": {
 		"ignore": []
 	},
@@ -12,7 +12,7 @@
 		"autoAudits": false
 	},
 	"compileType": "miniprogram",
-	"libVersion": "2.4.2",
+	"libVersion": "2.14.0",
 	"appid": "wx17529ad6527b9406",
 	"projectname": "mp-boilerplate",
 	"debugOptions": {

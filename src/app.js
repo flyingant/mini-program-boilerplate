@@ -4,7 +4,7 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 import log from './utils/logger';
-import { APP_NAME, VERSION, ENABLE_DEBUGGER_MESSAGE } from './project.constants.js';
+import { APP_NAME, VERSION, ENABLE_DEBUGGER_MESSAGE } from './constants';
 
 const merge = (dest, src) => {
   if (dest === null || typeof dest !== 'object' || Array.isArray(dest)) {
@@ -22,7 +22,7 @@ const merge = (dest, src) => {
 
 const INITIAL_STATE = {
   deviceInfo: {},
-  message: 'Hello 啊！',
+  message: 'Hello Again!!',
   count: 0,
 };
 
@@ -36,9 +36,11 @@ App({
   updateState(stateChange) {
     this.state = merge(this.state, stateChange);
     if (ENABLE_DEBUGGER_MESSAGE) {
+      // eslint-disable-next-line no-console
       console.group('App State Update');
-      console.log(stateChange);
-      console.log(this.state);
+      log(stateChange);
+      log(this.state);
+      // eslint-disable-next-line no-console
       console.groupEnd();
     }
   },

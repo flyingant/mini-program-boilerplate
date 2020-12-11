@@ -25,7 +25,7 @@ Page({
     ++count;
     app.dispatch({
       count,
-      message: `你点击了 ${count} 次`,
+      message: `你点击了 ${count} 次!`,
     });
     log('Page State:', this.data);
   },
