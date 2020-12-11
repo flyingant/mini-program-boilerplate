@@ -1,4 +1,5 @@
 {
+  "projectname": "mp-boilerplate",
 	"description": "mp-boilerplate",
 	"packOptions": {
 		"ignore": []
@@ -14,27 +15,5 @@
 	"compileType": "miniprogram",
 	"libVersion": "2.14.0",
 	"appid": "wx17529ad6527b9406",
-	"projectname": "mp-boilerplate",
-	"debugOptions": {
-		"hidedInDevtools": []
-	},
-	"isGameTourist": false,
-	"condition": {
-		"search": {
-			"current": -1,
-			"list": []
-		},
-		"conversation": {
-			"current": -1,
-			"list": []
-		},
-		"game": {
-			"currentL": -1,
-			"list": []
-		},
-		"miniprogram": {
-			"current": -1,
-			"list": []
-		}
-	}
+  "packNpmManually": true
 }

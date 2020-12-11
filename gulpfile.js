@@ -1,6 +1,7 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable no-unused-vars */
 const chalk = require('chalk');
+const fs = require('fs');
 const { task, src, dest, watch, series } = require('gulp');
 const del = require('del');
 const makeDir = require('make-dir');
@@ -36,14 +37,12 @@ const cssnanoPlugin = cssnano({
 task('make-dir', () => {
   return makeDir(`${DIST_DIR}`);
 });
-
 // clean the dist directory
-task('delete-dir', () => {
+task('clean', () => {
   return del(`${DIST_DIR}`, { force: true });
 });
-
 // compile the sass to css with TailwindCSS framework and then rename to the .wxss
-task('compile-sass-with-tailwind', () => {
+task('style:sass:tailwind', () => {
   return src(`${SOURCE_DIR}/**/*.scss`)
     .pipe(sass().on('error', sass.logError))
     .pipe(
@@ -63,9 +62,8 @@ task('compile-sass-with-tailwind', () => {
     .pipe(rename({ extname: '.wxss' }))
     .pipe(dest(`${DIST_DIR}`));
 });
-
 // compile the sass to css and then rename to the .wxss
-task('compile-sass', () => {
+task('style:sass', () => {
   return src(`${SOURCE_DIR}/**/*.scss`)
     .pipe(sass().on('error', sass.logError))
     .pipe(postcss([autoprefixer(['iOS >= 8', 'Android >= 4.1']), cssnanoPlugin]))
@@ -73,7 +71,7 @@ task('compile-sass', () => {
     .pipe(dest(`${DIST_DIR}`));
 });
 // copy the source code
-task('copy-source-code', () => {
+task('copy', () => {
   return src([
     `${PROJECT_DIR}/${SOURCE_DIR}/**/*.js`,
     `${PROJECT_DIR}/${SOURCE_DIR}/**/*.wxml`,
@@ -84,7 +82,12 @@ task('copy-source-code', () => {
     `${PROJECT_DIR}/${SOURCE_DIR}/**/*.svg`,
   ]).pipe(dest(`${DIST_DIR}`));
 });
-
+// copy mini program config
+task('copy-mp-config', () => {
+  return src(`${PROJECT_DIR}/mp.config.json`)
+    .pipe(rename('project.config.json'))
+    .pipe(dest(`${DIST_DIR}`));
+});
 // copy the env DEVELOPMENT constants
 task('copy-dev-constants', () => {
   return src(`${PROJECT_DIR}/constants.dev.js`)
@@ -109,15 +112,8 @@ task('copy-prod-constants', () => {
     .pipe(rename('constants.env.js'))
     .pipe(dest(`${DIST_DIR}`));
 });
-// copy mini program config
-task('copy-mp-config', () => {
-  return src(`${PROJECT_DIR}/mp.config.json`)
-    .pipe(rename('project.config.json'))
-    .pipe(dest(`${DIST_DIR}`));
-});
-
-// watch changes for Development
-task('watch-dev', () => {
+// watch changes and update
+task('watch', () => {
   watch(
     [
       `${PROJECT_DIR}/${SOURCE_DIR}/**/*.js`,
@@ -131,7 +127,7 @@ task('watch-dev', () => {
     {
       delay: 1000,
     },
-    series('copy-source-code'),
+    series('copy'),
   ).on('change', (path) => {
     log(`File ${path} was changed`);
   });
@@ -140,9 +136,9 @@ task('watch-dev', () => {
     {
       delay: 1000,
     },
-    series('compile-sass-with-tailwind'),
+    series('style:sass:tailwind'),
   ).on('change', (path) => {
-    log(`File ${path} was changed`);
+    log(`Style ${path} was changed`);
   });
 });
 // validate
@@ -182,10 +178,10 @@ task('validate', () => {
 task(
   'build-dev',
   series(
-    'delete-dir',
+    'clean',
     'make-dir',
-    'copy-source-code',
-    'compile-sass-with-tailwind',
+    'copy',
+    'style:sass:tailwind',
     'copy-dev-constants',
     'copy-mp-config',
   ),
@@ -194,10 +190,10 @@ task(
 task(
   'build-stg',
   series(
-    'delete-dir',
+    'clean',
     'make-dir',
-    'copy-source-code',
-    'compile-sass-with-tailwind',
+    'copy',
+    'style:sass:tailwind',
     'copy-stg-constants',
     'copy-mp-config',
   ),
@@ -206,10 +202,10 @@ task(
 task(
   'build-uat',
   series(
-    'delete-dir',
+    'clean',
     'make-dir',
-    'copy-source-code',
-    'compile-sass-with-tailwind',
+    'copy',
+    'style:sass:tailwind',
     'copy-uat-constants',
     'copy-mp-config',
   ),
@@ -218,11 +214,62 @@ task(
 task(
   'build-prod',
   series(
-    'delete-dir',
+    'clean',
     'make-dir',
-    'copy-source-code',
-    'compile-sass-with-tailwind',
+    'copy',
+    'style:sass:tailwind',
     'copy-prod-constants',
     'copy-mp-config',
   ),
 );
+// watch changes with env DEVELOPMENT
+task('dev', series('build-dev', 'watch'));
+// watch changes with env STAGING
+task('stg', series('build-stg', 'watch'));
+// watch changes with env UAT
+task('uat', series('build-uat', 'watch'));
+// TODO: upload the MP code by mini program CI - Working in Progress
+task('upload', (cb) => {
+  // eslint-disable-next-line global-require
+  const ci = require('miniprogram-ci');
+  fs.readFile(`${PROJECT_DIR}/mp.config.json`, 'utf8', (err, jsonString) => {
+    if (err) {
+      log('Mini Program Config file read failed:', err);
+      return;
+    }
+    const { appid: MP_APP_ID } = JSON.parse(jsonString);
+    const PATH_OF_MP_PROJECT_CODE = `${DIST_DIR}/`;
+    const PATH_OF_PRIVATE_KEY = './private.key';
+    (async () => {
+      const now = new Date();
+      const project = new ci.Project({
+        appid: MP_APP_ID,
+        type: 'miniProgram',
+        projectPath: PATH_OF_MP_PROJECT_CODE,
+        privateKeyPath: PATH_OF_PRIVATE_KEY,
+        ignores: ['node_modules/**/*'],
+      });
+      // build NPM Packages for Mini Program Project if needed, after the building, can upload
+      const warning = await ci.packNpm(project, {
+        ignores: ['pack_npm_ignore_list'],
+        reporter: (infos) => {
+          log(infos);
+        },
+      });
+      log('Building NPM packages:', warning);
+      // Upload the build
+      const uploadResult = await ci.upload({
+        project,
+        version: `ci.${now.getMonth() + 1}${now.getDate()}.${now.getHours()}${now.getMinutes()}`,
+        desc: 'Automatic built by Mini Program CI',
+        setting: {
+          es6: true,
+        },
+        robot: 6, // The robot name, 0 ~ 30
+        onProgressUpdate: log,
+      });
+      log('Upload Results: ', uploadResult);
+    })();
+  });
+  cb();
+});
