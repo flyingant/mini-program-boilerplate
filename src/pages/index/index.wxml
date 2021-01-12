@@ -9,6 +9,6 @@
     <view class="w-1_3 h-200 bg-red-900 text-purple-700 text-center">C</view>
   </view>
   <view class="w-full h-80 text-center" bindtap='onTapToChangeCount'>
-    <text>{{message}}</text>
+    <text class="text-red-800">{{message}}</text>
   </view>
 </view>

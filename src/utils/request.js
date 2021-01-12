@@ -2,7 +2,7 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable import/extensions */
 /* eslint-disable no-param-reassign */
-import { BASE_API_SERVER_URL } from '../project.constants.js';
+import { BASE_API_SERVER_URL } from '../constants.js';
 import log from './logger';
 
 // a wrapper to wrapper the wx.request to a promise objects

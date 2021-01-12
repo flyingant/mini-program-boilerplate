@@ -1,2 +1,3 @@
 bin/*.js
 mp-target-folder
+dist

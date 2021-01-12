@@ -1,0 +1,19 @@
+{
+  "projectname": "mp-boilerplate",
+	"description": "mp-boilerplate",
+	"packOptions": {
+		"ignore": []
+	},
+	"setting": {
+		"urlCheck": true,
+		"es6": true,
+		"postcss": true,
+		"minified": true,
+		"newFeature": true,
+		"autoAudits": false
+	},
+	"compileType": "miniprogram",
+	"libVersion": "2.14.0",
+	"appid": "wx17529ad6527b9406",
+  "packNpmManually": true
+}
