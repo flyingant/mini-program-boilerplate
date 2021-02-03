@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable no-unused-vars */
 const chalk = require('chalk');
@@ -9,13 +10,14 @@ const rename = require('gulp-rename');
 const replace = require('gulp-replace');
 const prettier = require('gulp-prettier');
 const eslint = require('gulp-eslint');
-
+const exec = require('gulp-exec');
 const postcss = require('gulp-postcss');
 const sass = require('gulp-sass');
 sass.compiler = require('node-sass');
 const autoprefixer = require('autoprefixer');
 const cssnano = require('cssnano');
 const tailwindcss = require('tailwindcss');
+const ci = require('miniprogram-ci');
 
 const log = (...args) => console.log(...args);
 
@@ -112,6 +114,24 @@ task('copy-prod-constants', () => {
     .pipe(rename('constants.env.js'))
     .pipe(dest(`${DIST_DIR}`));
 });
+// copy the package.json
+task('copy-package-json', () => {
+  return src(`${PROJECT_DIR}/package.json`).pipe(dest(`${DIST_DIR}`));
+});
+// run npm install in the Mini Program dist directory
+task('install-packages', (cb) => {
+  return src(`${DIST_DIR}`).pipe(
+    exec('cd dist ; npm install --production', async (err) => {
+      // build MP npm
+      await ci.packNpmManually({
+        packageJsonPath: `${DIST_DIR}/package.json`,
+        miniprogramNpmDistDir: `${DIST_DIR}`,
+      });
+      // build MP npm
+      cb(err);
+    }),
+  );
+});
 // watch changes and update
 task('watch', () => {
   watch(
@@ -184,6 +204,8 @@ task(
     'style:sass:tailwind',
     'copy-dev-constants',
     'copy-mp-config',
+    'copy-package-json',
+    'install-packages',
   ),
 );
 // build Staging source code
@@ -196,6 +218,8 @@ task(
     'style:sass:tailwind',
     'copy-stg-constants',
     'copy-mp-config',
+    'copy-package-json',
+    'install-packages',
   ),
 );
 // build UAT source code
@@ -208,6 +232,8 @@ task(
     'style:sass:tailwind',
     'copy-uat-constants',
     'copy-mp-config',
+    'copy-package-json',
+    'install-packages',
   ),
 );
 // build PROD source code
@@ -220,6 +246,8 @@ task(
     'style:sass:tailwind',
     'copy-prod-constants',
     'copy-mp-config',
+    'copy-package-json',
+    'install-packages',
   ),
 );
 // watch changes with env DEVELOPMENT
@@ -228,10 +256,10 @@ task('dev', series('build-dev', 'watch'));
 task('stg', series('build-stg', 'watch'));
 // watch changes with env UAT
 task('uat', series('build-uat', 'watch'));
+
 // TODO: upload the MP code by mini program CI - Working in Progress
 task('upload', (cb) => {
   // eslint-disable-next-line global-require
-  const ci = require('miniprogram-ci');
   fs.readFile(`${PROJECT_DIR}/mp.config.json`, 'utf8', (err, jsonString) => {
     if (err) {
       log('Mini Program Config file read failed:', err);

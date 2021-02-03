@@ -3,7 +3,7 @@
     <view class="w-1_2 h-200 bg-red-500 text-green-600 text-center">A</view>
     <view class="w-1_2 h-200 bg-red-800 text-blue-600 text-center">B</view>
   </view>
-  <view class="w-full flex flex-row h-200">
+  <view class="w-full flex flex-row h-200 mb-20">
     <view class="w-1_3 h-200 bg-red-700 text-purple-500 text-center">A</view>
     <view class="w-1_3 h-200 bg-red-800 text-purple-600 text-center">B</view>
     <view class="w-1_3 h-200 bg-red-900 text-purple-700 text-center">C</view>

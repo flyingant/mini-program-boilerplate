@@ -3,13 +3,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
-import log from './utils/logger';
 import merge from 'deepmerge';
-import { APP_NAME, VERSION, ENABLE_DEBUGGER_MESSAGE } from './constants';
+import log from './utils/logger';
+import { ENABLE_DEBUGGER_MESSAGE } from './constants';
 
 const INITIAL_STATE = {
   deviceInfo: {},
-  message: 'Hello Again!!',
+  message: 'Try Click Me!!',
   count: 0,
 };
 
