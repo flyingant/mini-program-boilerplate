@@ -1,16 +1,21 @@
-# Mini Program boilerplate 
+# Mini Program boilerplate
 
-`Mini Program Boilerplate` is boilerpalte helping to build the basice MP project quickly.
+This project is aimmed at launching a Mini Program project with more official rules and standard.
+
+Tips: This is NOT a mini program framework or the best practices to mini program development but just a tool helps to develop mini program project more easier and quickly.
 
 ### Features
 
 ```
 Node Builder support
-SCSS
+SCSS compiler
 Tailwind Support (part of)
 Prettier
 Eslint
-autoprefixer
+Gulp
+Typescript Support [WIP]
+Unit Test component [WIP]
+Mini Program build uploader
 ```
 
 ### Prerequisites

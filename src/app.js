@@ -4,21 +4,8 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 import log from './utils/logger';
+import merge from 'deepmerge';
 import { APP_NAME, VERSION, ENABLE_DEBUGGER_MESSAGE } from './constants';
-
-const merge = (dest, src) => {
-  if (dest === null || typeof dest !== 'object' || Array.isArray(dest)) {
-    return src;
-  }
-  if (src === null || typeof src !== 'object' || Array.isArray(src)) {
-    return src;
-  }
-  const result = { ...dest };
-  for (const key in src) {
-    result[key] = merge(result[key], src[key]);
-  }
-  return result;
-};
 
 const INITIAL_STATE = {
   deviceInfo: {},
